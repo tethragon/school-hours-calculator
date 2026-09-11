@@ -64,11 +64,11 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] text-slate-800 font-sans p-4 md:p-8">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <div className="min-h-screen bg-[#FDFBF7] text-slate-800 font-sans p-3 lg:p-5">
+      <div className="max-w-7xl mx-auto space-y-4 lg:space-y-6">
         
         {/* Header */}
-        <header className="flex flex-col md:flex-row items-center justify-between gap-4 border-b border-slate-200 pb-6">
+        <header className="flex flex-col md:flex-row items-center justify-between gap-4 border-b border-slate-200 pb-4 lg:pb-6">
           <div className="flex items-center gap-3">
             <div className="bg-indigo-100 p-3 rounded-2xl">
               <CalendarDays className="w-8 h-8 text-indigo-700" />
@@ -128,7 +128,7 @@ export default function App() {
                           >
                             <div 
                               className={`
-                                h-14 md:h-16 w-full rounded-xl flex items-center justify-center transition-all duration-200 select-none
+                                h-12 lg:h-14 w-full rounded-xl flex items-center justify-center transition-all duration-200 select-none
                                 ${isSelected 
                                   ? 'bg-indigo-500 text-white shadow-md shadow-indigo-200 ring-2 ring-indigo-500 ring-offset-2' 
                                   : 'bg-slate-50/50 hover:bg-slate-100 text-transparent hover:text-slate-300'
@@ -157,55 +157,33 @@ export default function App() {
           </div>
 
           {/* Sidebar / Results */}
-          <div className="w-full lg:w-80 flex-shrink-0 space-y-6">
+          <div className="w-full lg:w-80 flex-shrink-0 flex flex-col gap-4 lg:gap-5 lg:h-[calc(100vh-140px)] lg:sticky lg:top-5">
             
-            {/* Settings Card */}
-            <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6">
-              <div className="flex items-center gap-3 mb-5">
-                <div className="bg-blue-100 p-2.5 rounded-xl">
-                  <Settings2 className="w-5 h-5 text-blue-700" />
-                </div>
-                <h2 className="text-lg font-semibold text-slate-900">Παράμετροι Ωραρίου</h2>
+            {/* 1. Σύνολο Εβδομάδας (Top Priority) */}
+            <div className={`shrink-0 rounded-3xl shadow-lg p-5 lg:p-6 text-white relative overflow-hidden ${isWeeklyExceeded ? 'bg-rose-600 shadow-rose-200' : 'bg-indigo-600 shadow-indigo-200'}`}>
+              <div className={`absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 rounded-full opacity-50 blur-2xl ${isWeeklyExceeded ? 'bg-rose-500' : 'bg-indigo-500'}`}></div>
+              <h3 className={`text-sm font-medium mb-1 relative z-10 ${isWeeklyExceeded ? 'text-rose-100' : 'text-indigo-100'}`}>Σύνολο Εβδομάδας</h3>
+              <div className="text-2xl font-bold tracking-tight relative z-10 mb-2">
+                {formatDuration(totalWeeklyMinutes)}
               </div>
-              
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1.5">Διδακτικό Ωράριο (Κλάσμα)</label>
-                  <div className="flex items-center gap-3">
-                    <input 
-                      type="number" 
-                      min="1"
-                      value={workedHours} 
-                      onChange={(e) => setWorkedHours(Number(e.target.value))}
-                      className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-lg p-2.5 text-center font-medium focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                    />
-                    <span className="text-slate-400 font-medium text-lg">/</span>
-                    <input 
-                      type="number" 
-                      min="1"
-                      value={baseHours} 
-                      onChange={(e) => setBaseHours(Number(e.target.value))}
-                      className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-lg p-2.5 text-center font-medium focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                    />
-                  </div>
+              {isWeeklyExceeded && (
+                <div className="relative z-10 flex items-start gap-2 text-sm bg-black/20 p-3 rounded-xl mt-3 backdrop-blur-sm">
+                  <AlertCircle className="w-5 h-5 flex-shrink-0 text-rose-100" />
+                  <span className="text-rose-50">Υπέρβαση ορίου ({formatDuration(maxWeeklyMinutes)})</span>
                 </div>
-                
-                <div className="bg-blue-50 rounded-xl p-3 text-sm text-blue-800">
-                  <span className="block font-medium mb-0.5">Μέγιστο Εβδομαδιαίο Όριο:</span>
-                  <span>{formatDuration(maxWeeklyMinutes)}</span>
-                </div>
-              </div>
+              )}
             </div>
 
-            <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6">
-              <div className="flex items-center gap-3 mb-6">
+            {/* 2. Αναλυτικά (Scrollable) */}
+            <div className="flex-1 bg-white rounded-3xl shadow-sm border border-slate-100 p-5 lg:p-6 flex flex-col min-h-[250px]">
+              <div className="shrink-0 flex items-center gap-3 mb-4">
                 <div className="bg-emerald-100 p-2.5 rounded-xl">
                   <Calculator className="w-5 h-5 text-emerald-700" />
                 </div>
                 <h2 className="text-lg font-semibold text-slate-900">Αναλυτικά</h2>
               </div>
               
-              <div className="space-y-4">
+              <div className="flex-1 overflow-y-auto pr-2 space-y-4 custom-scrollbar">
                 {dailyCalculations.map((calc) => (
                   <div key={calc.day.id} className="flex flex-col gap-1.5 pb-4 border-b border-slate-100 last:border-0 last:pb-0">
                     <div className="flex justify-between items-center">
@@ -223,7 +201,7 @@ export default function App() {
                     {calc.isDailyExceeded && (
                       <div className="flex items-start gap-1.5 text-xs text-rose-600 bg-rose-50 p-2 rounded-md mt-1">
                         <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                        <span>Υπέρβαση ημερήσιου ορίου 6 ωρών</span>
+                        <span>Υπέρβαση ημερήσιου ορίου (6 ώρες)</span>
                       </div>
                     )}
                   </div>
@@ -231,18 +209,41 @@ export default function App() {
               </div>
             </div>
 
-            <div className={`rounded-3xl shadow-lg p-6 text-white relative overflow-hidden ${isWeeklyExceeded ? 'bg-rose-600 shadow-rose-200' : 'bg-indigo-600 shadow-indigo-200'}`}>
-              <div className={`absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 rounded-full opacity-50 blur-2xl ${isWeeklyExceeded ? 'bg-rose-500' : 'bg-indigo-500'}`}></div>
-              <h3 className={`text-sm font-medium mb-1 relative z-10 ${isWeeklyExceeded ? 'text-rose-100' : 'text-indigo-100'}`}>Σύνολο Εβδομάδας</h3>
-              <div className="text-2xl font-bold tracking-tight relative z-10 mb-2">
-                {formatDuration(totalWeeklyMinutes)}
-              </div>
-              {isWeeklyExceeded && (
-                <div className="relative z-10 flex items-start gap-2 text-sm bg-black/20 p-3 rounded-xl mt-3 backdrop-blur-sm">
-                  <AlertCircle className="w-5 h-5 flex-shrink-0 text-rose-100" />
-                  <span className="text-rose-50">Υπέρβαση μέγιστου επιτρεπτού ορίου ({formatDuration(maxWeeklyMinutes)})</span>
+            {/* 3. Settings Card (Bottom) */}
+            <div className="shrink-0 bg-white rounded-3xl shadow-sm border border-slate-100 p-5 lg:p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="bg-blue-100 p-2.5 rounded-xl">
+                  <Settings2 className="w-5 h-5 text-blue-700" />
                 </div>
-              )}
+                <h2 className="text-lg font-semibold text-slate-900">Παράμετροι</h2>
+              </div>
+              
+              <div className="space-y-4">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <input 
+                      type="number" 
+                      min="1"
+                      value={workedHours} 
+                      onChange={(e) => setWorkedHours(Number(e.target.value))}
+                      className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-lg p-2 text-center font-medium focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                    />
+                    <span className="text-slate-400 font-medium text-lg">/</span>
+                    <input 
+                      type="number" 
+                      min="1"
+                      value={baseHours} 
+                      onChange={(e) => setBaseHours(Number(e.target.value))}
+                      className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-lg p-2 text-center font-medium focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                    />
+                  </div>
+                </div>
+                
+                <div className="bg-blue-50 rounded-xl p-3 text-sm text-blue-800">
+                  <span className="block font-medium mb-0.5">Μέγιστο Εβδομαδιαίο Όριο:</span>
+                  <span>{formatDuration(maxWeeklyMinutes)}</span>
+                </div>
+              </div>
             </div>
           </div>
 
