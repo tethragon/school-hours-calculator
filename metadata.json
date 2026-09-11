@@ -1,0 +1,6 @@
+{
+  "name": "Υπολογισμός Ωραρίου Εκπαιδευτικού",
+  "description": "Μια εφαρμογή για τον υπολογισμό των ωρολογιακών ωρών παραμονής εκπαιδευτικών στο σχολείο βάσει του διδακτικού τους ωραρίου.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
